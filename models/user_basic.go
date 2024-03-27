@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	// "fmt"
 	"ginchat/utils"
 	"time"
 
@@ -28,11 +28,11 @@ func (table *UserBasic) TableName() string {
 }
 
 func GetUserList() []*UserBasic{
-
-	data := make([] *UserBasic, 10)
+    var data []*UserBasic
+	
 	utils.DB.Find(&data)
-	for _,v := range data {
-		fmt.Println(v)
-	}
+	// for _,v := range data {
+	// 	fmt.Println(v)
+	// }
 	return data
 }
