@@ -1,0 +1,61 @@
+info:
+  contact: {}
+paths:
+  /index:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      tags:
+      - 首页
+  /user/createUser:
+    get:
+      parameters:
+      - description: UserName
+        in: query
+        name: name
+        type: string
+      - description: Password
+        in: query
+        name: password
+        type: string
+      - description: Re-enterPassword
+        in: query
+        name: repassword
+        type: string
+      responses:
+        "200":
+          description: code", "message"}
+          schema:
+            type: string
+      summary: 新增用户
+      tags:
+      - User
+  /user/deleteUser:
+    get:
+      parameters:
+      - description: id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: code", "message"}
+          schema:
+            type: string
+      summary: 删除用户
+      tags:
+      - User
+  /user/getUserList:
+    get:
+      responses:
+        "200":
+          description: code", "message"}
+          schema:
+            type: string
+      summary: 所有用户
+      tags:
+      - User
+swagger: "2.0"
