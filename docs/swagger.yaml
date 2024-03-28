@@ -25,6 +25,14 @@ paths:
         in: query
         name: repassword
         type: string
+      - description: email
+        in: query
+        name: email
+        type: string
+      - description: phone
+        in: query
+        name: phone
+        type: string
       responses:
         "200":
           description: code", "message"}
@@ -56,6 +64,37 @@ paths:
           schema:
             type: string
       summary: 所有用户
+      tags:
+      - User
+  /user/updateUser:
+    post:
+      parameters:
+      - description: id
+        in: formData
+        name: id
+        type: string
+      - description: name
+        in: formData
+        name: name
+        type: string
+      - description: password
+        in: formData
+        name: password
+        type: string
+      - description: phone
+        in: formData
+        name: phone
+        type: string
+      - description: email
+        in: formData
+        name: email
+        type: string
+      responses:
+        "200":
+          description: code", "message"}
+          schema:
+            type: string
+      summary: 更新用户
       tags:
       - User
 swagger: "2.0"

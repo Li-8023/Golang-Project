@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -36,6 +37,8 @@ func GetUserList(c *gin.Context) {
 // @param name query string false "UserName"
 // @param password query string false "Password"
 // @param repassword query string false "Re-enterPassword"
+// @param email query string false "email"
+// @param phone query string false "phone"
 // @Success 200 {string} json{"code", "message"}
 // @Router /user/createUser [get]
 func CreateUser(c *gin.Context) {
@@ -44,7 +47,27 @@ func CreateUser(c *gin.Context) {
 	}
 	password := c.Query("password")
 	repassword := c.Query("repassword")
+	email := c.Query("email")
+	phone := c.Query("phone")
 
+	findName := models.FindUserByName(user.Name)
+	if findName.Name != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "用户名已注册"})
+		return
+	}
+
+	findPhone := models.FindUserByPhone(phone)
+	if findPhone.Phone != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "该电话已注册"})
+		return
+	}
+
+	findEmail := models.FindUserByEmail(email)
+
+	if findEmail.Email != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "该邮箱已注册"})
+		return
+	}
 	// Basic input validation
 	if user.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "用户名不能为空"})
@@ -54,6 +77,16 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "密码不能为空"})
 		return
 	}
+	if phone == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "电话不能为空"})
+		return
+	}
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "邮箱不能为空"})
+		return
+	}
+
+	
 
 	if password != repassword {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -64,22 +97,28 @@ func CreateUser(c *gin.Context) {
 	}
 
 	user.Password = password
-
+	user.Email = email
+	user.Phone = phone
+	if _, err := govalidator.ValidateStruct(user); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "校验数据失败", "error": err.Error()})
+		return
+	}
+	
 	result := models.CreateUser(user)
-    if result.Error != nil {
-        // Log the error for debugging
-        fmt.Printf("Error creating user: %v\n", result.Error)
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "code": 500,
-            "message": "创建用户失败",
-        })
-        return
-    }
+	if result.Error != nil {
+		// Log the error for debugging
+		fmt.Printf("Error creating user: %v\n", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    500,
+			"message": "创建用户失败",
+		})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{
-        "code": 200,
-        "message": "新增用户成功！",
-    })
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "新增用户成功！",
+	})
 }
 
 // DeleteUser
@@ -123,4 +162,52 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "用户删除成功"})
+}
+
+// UpdateUser
+// @Summary 更新用户
+// @Tags User
+// @param id formData string false "id"
+// @param name formData string false "name"
+// @param password formData string false "password"
+// @param phone formData string false "phone"
+// @param email formData string false "email"
+// @Success 200 {string} json{"code", "message"}
+// @Router /user/updateUser [post]
+func UpdateUser(c *gin.Context) {
+	var user models.UserBasic
+
+	idStr := c.PostForm("id")
+	fmt.Println("Received ID:", idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		// Additional check to see if idStr is empty
+		if idStr == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "用户ID参数缺失"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "无效的用户ID"})
+		}
+		return
+	}
+
+	user.ID = uint(id)
+	user.Name = c.PostForm("name")
+	user.Password = c.PostForm("password")
+	user.Phone = c.PostForm("phone")
+	user.Email = c.PostForm("email")
+
+	// Validate user struct here
+	if _, err := govalidator.ValidateStruct(user); err != nil {
+		// If validation fails, return an error message
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "校验数据失败", "error": err.Error()})
+		return
+	}
+
+	err = models.UpdateUser(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "message": "更新用户失败", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "修改用户成功"})
 }
