@@ -16,6 +16,7 @@ type UserBasic struct {
 	Identity      string
 	ClientIp      string
 	ClientPort    string
+	Salt          string
 	LoginTime     *time.Time
 	HeartbeatTime *time.Time
 	LogoutTime    *time.Time
@@ -62,4 +63,10 @@ func DeleteUser(user UserBasic) *gorm.DB {
 func UpdateUser(user UserBasic) error {
     result := utils.DB.Model(&user).Updates(UserBasic{Name: user.Name, Password: user.Password, Phone: user.Phone, Email: user.Email})
     return result.Error
+}
+
+func Login(name string, password string) UserBasic {
+    user := UserBasic{}
+	utils.DB.Where("name = ? and password = ?", name, password).First(&user)
+	return user
 }

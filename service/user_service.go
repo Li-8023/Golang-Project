@@ -5,13 +5,14 @@ package service
 import (
 	"fmt"
 	"ginchat/models"
-	"net/http"
-	"strconv"
-
+	"ginchat/utils"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"math/rand"
+	"net/http"
+	"strconv"
 )
 
 // GetUserList
@@ -50,6 +51,8 @@ func CreateUser(c *gin.Context) {
 	email := c.Query("email")
 	phone := c.Query("phone")
 
+	salt := fmt.Sprintf("%06d", rand.Int31())
+
 	findName := models.FindUserByName(user.Name)
 	if findName.Name != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "用户名已注册"})
@@ -85,9 +88,6 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "邮箱不能为空"})
 		return
 	}
-
-	
-
 	if password != repassword {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
@@ -96,14 +96,15 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	user.Password = password
+	user.Password = utils.MakePassword(password, salt)
+	user.Salt = salt
 	user.Email = email
 	user.Phone = phone
-	if _, err := govalidator.ValidateStruct(user); err != nil{
+	if _, err := govalidator.ValidateStruct(user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "校验数据失败", "error": err.Error()})
 		return
 	}
-	
+
 	result := models.CreateUser(user)
 	if result.Error != nil {
 		// Log the error for debugging
@@ -210,4 +211,37 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "修改用户成功"})
+}
+
+// Login
+// @Summary 登录
+// @Tags User
+// @param name query string false "name"
+// @param password query string false "password"
+// @Success 200 {string} json{"code", "message"}
+// @Router /user/login [post]
+func Login(c *gin.Context) {
+	name := c.Query("name")
+	password := c.Query("password")
+
+	// Attempt to find the user by name
+	user := models.FindUserByName(name)
+
+	// Check if the user exists by checking a unique field, assuming 'ID' can serve that purpose.
+	// This assumes an ID of 0 indicates the user was not found.
+	if user.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "该用户不存在"})
+		return
+	}
+
+	// Check if the provided password matches the stored password
+	if !utils.ValidPassword(password, user.Salt, user.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "密码不正确"})
+		return
+	}
+
+	pwd := utils.MakePassword(password, user.Salt)
+	// Process the login...
+	data := models.Login(name, pwd)
+	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "登录成功", "info": data})
 }

@@ -66,6 +66,25 @@ paths:
       summary: 所有用户
       tags:
       - User
+  /user/login:
+    post:
+      parameters:
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: password
+        in: query
+        name: password
+        type: string
+      responses:
+        "200":
+          description: code", "message"}
+          schema:
+            type: string
+      summary: 登录
+      tags:
+      - User
   /user/updateUser:
     post:
       parameters:
