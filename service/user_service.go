@@ -119,6 +119,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "新增用户成功！",
+		"info": result,
 	})
 }
 
@@ -162,7 +163,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "用户删除成功"})
+	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "用户删除成功", "info": result})
 }
 
 // UpdateUser
@@ -210,7 +211,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "修改用户成功"})
+	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "修改用户成功", "info": err})
 }
 
 // Login
@@ -227,21 +228,17 @@ func Login(c *gin.Context) {
 	// Attempt to find the user by name
 	user := models.FindUserByName(name)
 
-	// Check if the user exists by checking a unique field, assuming 'ID' can serve that purpose.
-	// This assumes an ID of 0 indicates the user was not found.
 	if user.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "该用户不存在"})
 		return
 	}
 
-	// Check if the provided password matches the stored password
 	if !utils.ValidPassword(password, user.Salt, user.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "message": "密码不正确"})
 		return
 	}
 
 	pwd := utils.MakePassword(password, user.Salt)
-	// Process the login...
 	data := models.Login(name, pwd)
 	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "登录成功", "info": data})
 }
