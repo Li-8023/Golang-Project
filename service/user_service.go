@@ -6,13 +6,18 @@ import (
 	"fmt"
 	"ginchat/models"
 	"ginchat/utils"
-	"github.com/asaskevich/govalidator"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
+
+	// "golang.org/x/net/websocket"
+	"gorm.io/gorm"
 )
 
 // GetUserList
@@ -119,7 +124,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "新增用户成功！",
-		"info": result,
+		"info":    result,
 	})
 }
 
@@ -241,4 +246,48 @@ func Login(c *gin.Context) {
 	pwd := utils.MakePassword(password, user.Salt)
 	data := models.Login(name, pwd)
 	c.JSON(http.StatusOK, gin.H{"code": 200, "message": "登录成功", "info": data})
+}
+
+// 防止跨域站点伪造请求
+var upGrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins
+	},
+}
+
+func SendMsg(c *gin.Context) {
+	ws, err := upGrade.Upgrade(c.Writer, c.Request, nil)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer func(ws *websocket.Conn) {
+		err = ws.Close()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}(ws)
+
+	MsgHandler(ws, c)
+}
+
+func MsgHandler(ws *websocket.Conn, c *gin.Context) {
+	for {
+		msg, err := utils.Subscribe(c, utils.PublishKey)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		tm := time.Now().Format("2006-01-02T15:04:05")
+		m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
+		err = ws.WriteMessage(1, []byte(m))
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 }
