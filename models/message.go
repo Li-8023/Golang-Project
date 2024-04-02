@@ -1,6 +1,14 @@
 package models
 
 import (
+	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
+	"strconv"
+	"sync"
+
+	"github.com/gorilla/websocket"
 	"gopkg.in/fatih/set.v0"
 	"gorm.io/gorm"
 )
@@ -8,9 +16,9 @@ import (
 // 消息
 type Message struct {
 	gorm.Model
-	FormId   uint   //发送者
-	TargetId uint   //消息接收者
-	Type     string //发送类型 （群聊，私聊）
+	FormId   int64  //发送者
+	TargetId int64  //消息接收者
+	Type     int    //发送类型 （群聊，私聊）
 	Media    int    //消息类型 （文字，图片，音频）
 	Content  string //消息内容
 	Pic      string
@@ -43,21 +51,25 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	//检验token等合法性
 	query := request.URL.Query()
 	Id := query.Get("userId")
-	userId, _ := strconv.ParseInt(Id, 10, 64)
+	userId, err := strconv.ParseInt(Id, 10, 64)
+	if err != nil {
+        fmt.Println("Error parsing userID:", err)
+        return
+    }
 	// token := query.Get("token")
-	targetId := query.Get("targetId")
-	context := query.Get("context")
-	msgType := query.Get("type")
-	isvalid := true //checkToken()
+	// targetId := query.Get("targetId")
+	// context := query.Get("context")
+	// msgType := query.Get("type")
+	isValidToken := true
+
 	conn, err := (&websocket.Upgrader{
-		//token校验
 		CheckOrigin: func(r *http.Request) bool {
-			return isvalid
+			return isValidToken
 		},
 	}).Upgrade(writer, request, nil)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("WebSocket upgrade error:", err)
 		return
 	}
 
@@ -78,5 +90,128 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	go sendProc(node)
 	//完成接受逻辑
 	go recvProc(node)
-	
+
+	sendMsg(userId, []byte("欢迎进入聊天室"))
+
+}
+
+func sendProc(node *Node) {
+	for {
+		select {
+		case data := <-node.DataQueue:
+			err := node.Conn.WriteMessage(websocket.TextMessage, data)
+			if err != nil {
+				fmt.Println("WriteMessage error:", err)
+				return
+			}
+		}
+	}
+
+}
+
+func recvProc(node *Node) {
+	for {
+
+		_, data, err := node.Conn.ReadMessage()
+		if err != nil {
+			fmt.Println("ReadMessage error:", err)
+			return
+		}
+		broadMsg(data)
+		fmt.Println("[ws] <<<<< ", data)
+	}
+}
+
+var udpsendChan chan []byte = make(chan []byte, 1024)
+
+func broadMsg(data []byte) {
+	udpsendChan <- data
+}
+
+func init() {
+	go udpsendProc()
+	go udpRecProc()
+}
+
+// 完成udp数据发送协程
+func udpsendProc() {
+	con, err := net.DialUDP("udp", nil, &net.UDPAddr{
+		// 10.16.0.179
+		IP:   net.IPv4(192, 168, 100, 134),
+		Port: 3000,
+	})
+
+	defer con.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for {
+		select {
+		case data := <-udpsendChan:
+			_, err := con.Write(data)
+			if err != nil {
+				fmt.Println("WriteMessage error:", err)
+				return
+			}
+		}
+	}
+}
+
+// 完成udp数据接受
+func udpRecProc() {
+	con, err := net.ListenUDP("udp", &net.UDPAddr{
+		IP:   net.IPv4zero,
+		Port: 3000,
+	})
+
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+	defer con.Close()
+
+	for {
+		var buf [512]byte
+		n, err := con.Read(buf[0:])
+
+		if err != nil {
+			fmt.Println("Error", err)
+			return
+		}
+
+		dispatch(buf[0:n])
+	}
+}
+
+// 后端调度逻辑
+func dispatch(data []byte) {
+	msg := Message{}
+	err := json.Unmarshal(data, &msg)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	switch msg.Type {
+
+	case 1: //私信
+		sendMsg(msg.FormId, data)
+		// case 2: //群发
+		// 	sendGroupMsg()
+		// case 3: //广播
+		// 	sendAllMsg()
+		// case 4:
+
+	}
+}
+
+func sendMsg(userId int64, msg []byte) {
+	rwLocker.RLock()
+	node, ok := clientMap[userId]
+	rwLocker.Unlock()
+
+	if ok {
+		node.DataQueue <- msg
+	}
 }
