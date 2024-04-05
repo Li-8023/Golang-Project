@@ -16,7 +16,7 @@ import (
 // 消息
 type Message struct {
 	gorm.Model
-	FormId   int64  //发送者
+	FromId   int64  //发送者
 	TargetId int64  //消息接收者
 	Type     int    //发送类型 （群聊，私聊）
 	Media    int    //消息类型 （文字，图片，音频）
@@ -51,15 +51,16 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	//检验token等合法性
 	query := request.URL.Query()
 	Id := query.Get("userId")
+
+	fmt.Println("Query Parameters:", query)
+	fmt.Println("userID:", Id)
+
 	userId, err := strconv.ParseInt(Id, 10, 64)
 	if err != nil {
-        fmt.Println("Error parsing userID:", err)
-        return
-    }
-	// token := query.Get("token")
-	// targetId := query.Get("targetId")
-	// context := query.Get("context")
-	// msgType := query.Get("type")
+		fmt.Println("Error parsing userID:", err)
+		return
+	}
+
 	isValidToken := true
 
 	conn, err := (&websocket.Upgrader{
@@ -129,17 +130,24 @@ func broadMsg(data []byte) {
 }
 
 func init() {
-	go udpsendProc()
+	go udpSendProc()
 	go udpRecProc()
 }
 
 // 完成udp数据发送协程
-func udpsendProc() {
+func udpSendProc() {
+
 	con, err := net.DialUDP("udp", nil, &net.UDPAddr{
-		// 10.16.0.179
-		IP:   net.IPv4(192, 168, 100, 134),
+		IP:   net.IPv4(127, 0, 0, 1),
 		Port: 3000,
 	})
+	// con, err := net.DialUDP("udp", nil, &net.UDPAddr{
+	// 	// 10.16.0.179
+	// 	// 192.168.100.134
+	// 	IP: net.IPv4(192, 168, 100, 134),
+	// 	//   IP:   net.IPv4(127,0,0,1),
+	// 	Port: 3000,
+	// })
 
 	defer con.Close()
 	if err != nil {
@@ -196,7 +204,7 @@ func dispatch(data []byte) {
 	switch msg.Type {
 
 	case 1: //私信
-		sendMsg(msg.FormId, data)
+		sendMsg(msg.TargetId, data)
 		// case 2: //群发
 		// 	sendGroupMsg()
 		// case 3: //广播
@@ -209,7 +217,7 @@ func dispatch(data []byte) {
 func sendMsg(userId int64, msg []byte) {
 	rwLocker.RLock()
 	node, ok := clientMap[userId]
-	rwLocker.Unlock()
+	rwLocker.RUnlock()
 
 	if ok {
 		node.DataQueue <- msg
