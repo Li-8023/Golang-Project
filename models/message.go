@@ -52,14 +52,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query()
 	Id := query.Get("userId")
 
-	fmt.Println("Query Parameters:", query)
-	fmt.Println("userID:", Id)
-
-	userId, err := strconv.ParseInt(Id, 10, 64)
-	if err != nil {
-		fmt.Println("Error parsing userID:", err)
-		return
-	}
+	userId, _ := strconv.ParseInt(Id, 10, 64)
 
 	isValidToken := true
 
