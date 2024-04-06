@@ -31,7 +31,7 @@ const docTemplate = `{
             }
         },
         "/user/createUser": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],
@@ -79,7 +79,7 @@ const docTemplate = `{
             }
         },
         "/user/deleteUser": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],
@@ -103,7 +103,7 @@ const docTemplate = `{
             }
         },
         "/user/getUserList": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],

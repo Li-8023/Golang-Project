@@ -85,7 +85,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	//完成接受逻辑
 	go recvProc(node)
 
-	sendMsg(userId, []byte("欢迎进入聊天室"))
+	sendMsg(userId, []byte("您好，欢迎进入聊天室"))
 
 }
 

@@ -20,7 +20,7 @@
             }
         },
         "/user/createUser": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],
@@ -68,7 +68,7 @@
             }
         },
         "/user/deleteUser": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],
@@ -92,7 +92,7 @@
             }
         },
         "/user/getUserList": {
-            "get": {
+            "post": {
                 "tags": [
                     "User"
                 ],

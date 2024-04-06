@@ -11,7 +11,7 @@ paths:
       tags:
       - 首页
   /user/createUser:
-    get:
+    post:
       parameters:
       - description: UserName
         in: query
@@ -42,7 +42,7 @@ paths:
       tags:
       - User
   /user/deleteUser:
-    get:
+    post:
       parameters:
       - description: id
         in: query
@@ -57,7 +57,7 @@ paths:
       tags:
       - User
   /user/getUserList:
-    get:
+    post:
       responses:
         "200":
           description: code", "message"}

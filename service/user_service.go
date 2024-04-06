@@ -24,7 +24,7 @@ import (
 // @Summary 所有用户
 // @Tags User
 // @Success 200 {string} json{"code", "message"}
-// @Router /user/getUserList [get]
+// @Router /user/getUserList [post]
 func GetUserList(c *gin.Context) {
 
 	// data := make([]*models.UserBasic, 10)
@@ -46,7 +46,7 @@ func GetUserList(c *gin.Context) {
 // @param email query string false "email"
 // @param phone query string false "phone"
 // @Success 200 {string} json{"code", "message"}
-// @Router /user/createUser [get]
+// @Router /user/createUser [post]
 func CreateUser(c *gin.Context) {
 	user := models.UserBasic{
 		Name: c.Query("name"),
@@ -133,7 +133,7 @@ func CreateUser(c *gin.Context) {
 // @Tags User
 // @param id query string false "id"
 // @Success 200 {string} json{"code", "message"}
-// @Router /user/deleteUser [get]
+// @Router /user/deleteUser [post]
 func DeleteUser(c *gin.Context) {
 	// Check if the ID query parameter exists
 	idStr := c.Query("id")
@@ -227,8 +227,9 @@ func UpdateUser(c *gin.Context) {
 // @Success 200 {string} json{"code", "message"}
 // @Router /user/login [post]
 func Login(c *gin.Context) {
-	name := c.Query("name")
-	password := c.Query("password")
+
+	name := c.Request.FormValue("name")
+	password := c.Request.FormValue("password")
 
 	// Attempt to find the user by name
 	user := models.FindUserByName(name)
@@ -291,7 +292,6 @@ func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 		}
 	}
 }
-
 
 func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
