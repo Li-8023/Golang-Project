@@ -32,6 +32,12 @@ const docTemplate = `{
         },
         "/user/createUser": {
             "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "User"
                 ],
@@ -41,38 +47,58 @@ const docTemplate = `{
                         "type": "string",
                         "description": "UserName",
                         "name": "name",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "Password",
                         "name": "password",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Re-enterPassword",
-                        "name": "repassword",
-                        "in": "query"
+                        "description": "Re-enter Password",
+                        "name": "Identity",
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "email",
+                        "description": "Email",
                         "name": "email",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "phone",
+                        "description": "Phone",
                         "name": "phone",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "code\", \"message\"}",
+                        "description": "Returns a message on successful user creation",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Returns a code and a message if there is a bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Returns a code and a message if there is an internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -94,9 +120,31 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "code\", \"message\"}",
+                        "description": "Returns a message on successful user creation",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Returns a code and a message if there is a bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Returns a code and a message if there is a status not found error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Returns a code and a message if there is an internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -120,6 +168,12 @@ const docTemplate = `{
         },
         "/user/login": {
             "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "User"
                 ],
@@ -127,22 +181,46 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "name",
+                        "description": "UserName",
                         "name": "name",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "password",
+                        "description": "Password",
                         "name": "password",
-                        "in": "query"
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "code\", \"message\"}",
+                        "description": "Returns a message on successful user creation",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Returns a code and a message if there is a bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Returns a code and a message if there is a status not found error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Returns a code and a message if there is an internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -188,9 +266,31 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "code\", \"message\"}",
+                        "description": "Returns a message on successful user creation",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Returns a code and a message if there is a bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Returns a code and a message if there is a status not found error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Returns a code and a message if there is an internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }

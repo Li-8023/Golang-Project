@@ -11,7 +11,8 @@ import (
 // @Success 200 {string} welcome
 // @Router /index [get]
 func GetIndex(c *gin.Context) {
-	ind, err := template.ParseFiles("index.html")
+	// ind, err := template.ParseFiles("index.html")
+	ind, err := template.ParseFiles("index.html", "views/chat/head.html")
 	if err != nil {
 		panic(err)
 	}

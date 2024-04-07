@@ -2,14 +2,15 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
+    {{template "/chat/head.shtml"}}
+    <!-- <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/asset/plugins/mui/css/mui.css">
     <link rel="stylesheet" href="/asset//css/login.css">
     <script src="/asset/plugins//mui/js/mui.js"></script>
     <script src="/asset/js/vue.min.js"></script>
-    <script src="/asset/js/util.js"></script>
+    <script src="/asset/js/util.js"></script> -->
 </head>
 
 <body>
@@ -52,22 +53,21 @@
         },
         methods: {
             login: function () {
-                //检测手机号是否正确
-                console.log("login")
-                //检测密码是否为空
-
-                //网络请求
-                //封装了promis
-                util.post("user/login", this.user).then(res => {
-                    console.log(res)
-                    if (res.code != 0) {
+                   util.post("user/login", this.user).then(res => {
+                    console.log("res here is", res)
+                    if (res.code != 200) {
+                        console.log(res.message)
                         mui.toast(res.message)
                     } else {
+                        console.log(res.message)
                         var url = "/toChat?userId=" + res.data.ID + "&token=" + res.data.Identity
-                        userInfo(res.data)
-                        userId(res.data.ID)
+                        // userInfo(res.data)
+                        // userId(res.data.ID)
                         mui.toast("登录成功,即将跳转")
-                        location.href = url
+                         setTimeout(function () {
+                            location.href = url
+                        }, 3000); 
+                        
                     }
                 })
             },

@@ -12,32 +12,53 @@ paths:
       - 首页
   /user/createUser:
     post:
+      consumes:
+      - application/x-www-form-urlencoded
       parameters:
       - description: UserName
-        in: query
+        in: formData
         name: name
+        required: true
         type: string
       - description: Password
-        in: query
+        in: formData
         name: password
+        required: true
         type: string
-      - description: Re-enterPassword
-        in: query
-        name: repassword
+      - description: Re-enter Password
+        in: formData
+        name: Identity
+        required: true
         type: string
-      - description: email
-        in: query
+      - description: Email
+        in: formData
         name: email
+        required: true
         type: string
-      - description: phone
-        in: query
+      - description: Phone
+        in: formData
         name: phone
+        required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: code", "message"}
+          description: Returns a message on successful user creation
           schema:
-            type: string
+            additionalProperties: true
+            type: object
+        "400":
+          description: Returns a code and a message if there is a bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Returns a code and a message if there is an internal server
+            error
+          schema:
+            additionalProperties: true
+            type: object
       summary: 新增用户
       tags:
       - User
@@ -50,9 +71,27 @@ paths:
         type: string
       responses:
         "200":
-          description: code", "message"}
+          description: Returns a message on successful user creation
           schema:
-            type: string
+            additionalProperties: true
+            type: object
+        "400":
+          description: Returns a code and a message if there is a bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Returns a code and a message if there is a status not found
+            error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Returns a code and a message if there is an internal server
+            error
+          schema:
+            additionalProperties: true
+            type: object
       summary: 删除用户
       tags:
       - User
@@ -68,20 +107,44 @@ paths:
       - User
   /user/login:
     post:
+      consumes:
+      - application/x-www-form-urlencoded
       parameters:
-      - description: name
-        in: query
+      - description: UserName
+        in: formData
         name: name
+        required: true
         type: string
-      - description: password
-        in: query
+      - description: Password
+        in: formData
         name: password
+        required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: code", "message"}
+          description: Returns a message on successful user creation
           schema:
-            type: string
+            additionalProperties: true
+            type: object
+        "400":
+          description: Returns a code and a message if there is a bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Returns a code and a message if there is a status not found
+            error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Returns a code and a message if there is an internal server
+            error
+          schema:
+            additionalProperties: true
+            type: object
       summary: 登录
       tags:
       - User
@@ -110,9 +173,27 @@ paths:
         type: string
       responses:
         "200":
-          description: code", "message"}
+          description: Returns a message on successful user creation
           schema:
-            type: string
+            additionalProperties: true
+            type: object
+        "400":
+          description: Returns a code and a message if there is a bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Returns a code and a message if there is a status not found
+            error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Returns a code and a message if there is an internal server
+            error
+          schema:
+            additionalProperties: true
+            type: object
       summary: 更新用户
       tags:
       - User

@@ -115,7 +115,7 @@ Core.prototype.post=function(uri,data,fn){
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST",url, true);
-        // 添加http头，发送信息至服务器时内容编码类型
+       
         xhr.setRequestHeader(
         	"Content-Type",
 			"application/x-www-form-urlencoded"

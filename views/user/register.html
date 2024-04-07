@@ -56,25 +56,30 @@
                     name: "",
                     password: "",
                     Identity: "",
+                    phone: "",
+                    email: "",
                 }
             }
         },
         methods: {
             login: function () {
-                //检测密码是否为空
                 console.log(this.user)
-                //网络请求
-                //封装了promis
                 util.post("/user/createUser", this.user).then(res => {
                     console.log(res)
-                    if (res.code != 0) {
+                    if (res.code != 200) {
                         mui.toast(res.message)
                     } else {
-                        //location.replace("localhost:8081")
-                        location.href = "/"
                         mui.toast("注册成功,即将跳转")
+                        console.log("注册成功")
+                        setTimeout(function () {
+                            location.href = "/";
+                        }, 3000); 
                     }
-                })
+                }).catch(function (error) {
+                    // Handle any errors here
+                    console.error('An error occurred:', error);
+                    mui.toast('注册失败，请稍后再试。');
+                });
             },
         }
     })
