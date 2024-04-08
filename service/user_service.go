@@ -327,3 +327,16 @@ func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
+
+func SearchFriend(c *gin.Context) {
+	// id, _ := strconv.Atoi(c.PostForm("userId"))
+	 idStr := c.Request.FormValue("userId")
+    id, err := strconv.Atoi(idStr)
+    if err != nil {
+        c.JSON(200, gin.H{"code": http.StatusBadRequest, "message": "无效的用户ID"})
+        return
+    }
+	
+	users := models.SearchFriend(uint(id))
+	c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "查询好友列表成功", "data": users})
+}
