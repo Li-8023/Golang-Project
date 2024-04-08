@@ -54,19 +54,18 @@
         methods: {
             login: function () {
                    util.post("user/login", this.user).then(res => {
-                    console.log("res here is", res)
                     if (res.code != 200) {
                         console.log(res.message)
                         mui.toast(res.message)
                     } else {
                         console.log(res.message)
-                        var url = "/toChat?userId=" + res.data.ID + "&token=" + res.data.Identity
-                        // userInfo(res.data)
-                        // userId(res.data.ID)
+                        console.log(res)
+                        var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity
+                       
                         mui.toast("登录成功,即将跳转")
                          setTimeout(function () {
                             location.href = url
-                        }, 3000); 
+                        }, 2000); 
                         
                     }
                 })
