@@ -19,10 +19,6 @@
                     && ((item.msg.Type==1) && (item.ismine? item.msg.TargetId==msgcontext.TargetId : item.msg.userId==msgcontext.TargetId ))
                     || ((item.msg.Type==2) && ( item.msg.TargetId==msgcontext.TargetId ))
                     ">
-                        <!--  
-                    <div v-text="item.msg"></div>
-                    <div v-text="msgcontext"></div>
-                  -->
                         <div v-if="item.ismine">
                             <img class="avatar right" :src="info.icon ||'/asset/images/avatar0.png'" />
                         </div>

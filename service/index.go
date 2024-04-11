@@ -55,3 +55,7 @@ func ToChat(c *gin.Context) {
 	fmt.Println("ToChat>>>>>", user)
 	ind.Execute(c.Writer, user)
 }
+
+func Chat(c *gin.Context){
+	models.Chat(c.Writer, c.Request)
+}

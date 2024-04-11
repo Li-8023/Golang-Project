@@ -61,7 +61,8 @@
                         console.log(res.message)
                         console.log(res)
                         var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity
-                       
+                        userInfo(res.data)
+                        userId(res.data.ID)
                         mui.toast("登录成功,即将跳转")
                          setTimeout(function () {
                             location.href = url
