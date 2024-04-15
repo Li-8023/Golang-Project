@@ -341,3 +341,28 @@ func SearchFriend(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "查询好友列表成功", "data": users})
 	utils.RespOKList(c.Writer, users, len(users))
 }
+
+func AddFriend(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	targetId, _ := strconv.Atoi(c.Request.FormValue("targetId"))
+	
+	
+	code := models.AddFriend(uint(userId), uint(targetId))
+
+	if code == 0{
+		utils.RespOK(c.Writer, code, "添加好友成功")
+	}else if code == -1{
+		utils.RespFail(c.Writer, "无效ID")
+	}else if code == -2{
+		utils.RespFail(c.Writer, "不能添加自己为好友")
+	}else if code == -3{
+		utils.RespFail(c.Writer, "该用户不存在")
+	}else if code == -4{
+		utils.RespFail(c.Writer, "该用户不存在")
+	}else if code == -5{
+		utils.RespFail(c.Writer, "您已添加该好友")
+	}else if code == -7{
+		utils.RespFail(c.Writer, "添加好友失败")
+	}
+	
+}

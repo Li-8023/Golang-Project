@@ -1,8 +1,9 @@
 package models
 
 import (
-	"ginchat/utils"
 	"fmt"
+	"ginchat/utils"
+
 	"gorm.io/gorm"
 )
 
@@ -39,3 +40,71 @@ func SearchFriend(userId uint) []UserBasic{
 	return users
 
 }
+
+
+func AddFriend(userId uint, targetId uint) int{
+
+	fmt.Println("user_id: ", userId, "target_id: ", targetId)
+
+	if userId == 0 || targetId == 0 {
+		return -1 // Invalid user or target ID
+	}
+
+	if userId == targetId {
+        return -2 // Cannot add self as a friend
+    }
+	// Find the user by ID
+    user := FindUserById(userId)
+    if user.Identity == "" {
+        return -3 // User does not exist
+    }
+
+	// Find the target by ID
+    target := FindUserById(targetId)
+    if target.Salt == "" {
+        return -4 // Target does not exist
+    }
+
+	// Check if the contact already exists
+    var existingContact Contact
+
+	//utils.DB.Where("owner_id =?  and target_id =? and type=1", userId, targetUser.ID).Find(&contact0)
+    result := utils.DB.Where("owner_id = ? AND target_id = ? and type=1", userId, targetId).First(&existingContact)
+    if result.Error == nil && existingContact.ID != 0 {
+        return -5 // Friendship already exists
+    }
+
+	
+
+	 // Create a new contact
+    contact := Contact{
+        OwnerId:  userId,
+        TargetId: targetId,
+        Type:     1, 
+    }
+
+	createResult := utils.DB.Create(&contact)
+    if createResult.Error != nil {
+        return -7 // Error occurred during database insert operation
+    }
+
+    return 0 // Successfully added friend
+
+
+
+	// user := UserBasic{}
+
+	// if targetId != 0 {
+	// 	user = FindUserById(targetId)
+	// 	if user.Identity != "" {
+	// 		contact := Contact{}
+	// 		contact.OwnerId = userId
+	// 		contact.TargetId = targetId
+	// 		contact.Type = 1
+	// 		utils.DB.Create(contact)
+	// 		return 0
+	// 	}
+	// 	return -1
+	// }
+	// return -1
+} 

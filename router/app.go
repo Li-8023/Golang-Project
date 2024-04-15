@@ -29,6 +29,7 @@ func Router() *gin.Engine {
 	r.GET("/chat", service.Chat)
 
 	r.POST("/searchFriends", service.SearchFriend)
+	r.POST("/contact/addfriend", service.AddFriend)
 	//User info
 	r.POST("/user/getUserList", service.GetUserList)
 	r.POST("/user/createUser", service.CreateUser)

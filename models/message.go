@@ -114,7 +114,7 @@ func recvProc(node *Node) {
 			fmt.Println("ReadMessage error:", err)
 			return
 		}
-		broadMsg(data)
+		broadMsg(data) //to-do 将消息广播到局域网
 		fmt.Println("[ws] recvProc <<<<< ", string(data))
 	}
 }
