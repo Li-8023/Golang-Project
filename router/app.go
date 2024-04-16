@@ -28,8 +28,10 @@ func Router() *gin.Engine {
 	r.GET("/toChat", service.ToChat)
 	r.GET("/chat", service.Chat)
 
+	//friend
 	r.POST("/searchFriends", service.SearchFriend)
 	r.POST("/contact/addfriend", service.AddFriend)
+
 	//User info
 	r.POST("/user/getUserList", service.GetUserList)
 	r.POST("/user/createUser", service.CreateUser)
@@ -37,10 +39,12 @@ func Router() *gin.Engine {
 	r.POST("/user/updateUser", service.UpdateUser)
 	r.POST("/user/login", service.Login)
 	
-
+	//group
+	r.POST("/contact/createCommunity", service.CreateCommunity)
 	//发送消息
 	r.GET("/user/sendMsg", service.SendMsg)
 	r.GET("/user/sendUserMsg", service.SendUserMsg)
 	r.POST("/attach/upload", service.Upload)
+
 	return r
 }
