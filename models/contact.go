@@ -55,7 +55,7 @@ func AddFriend(userId uint, targetId uint) int{
     }
 	// Find the user by ID
     user := FindUserById(userId)
-    if user.Identity == "" {
+    if user.Salt == "" {
         return -3 // User does not exist
     }
 
@@ -75,7 +75,7 @@ func AddFriend(userId uint, targetId uint) int{
     }
 
 	
-
+	tx := utils.DB.Begin()
 	 // Create a new contact
     contact := Contact{
         OwnerId:  userId,
@@ -84,9 +84,23 @@ func AddFriend(userId uint, targetId uint) int{
     }
 
 	createResult := utils.DB.Create(&contact)
+
+	contact2 := Contact{
+        OwnerId:  targetId,
+        TargetId: userId,
+        Type:     1, 
+    }
+
+	create2Result := utils.DB.Create(&contact2)
     if createResult.Error != nil {
         return -7 // Error occurred during database insert operation
     }
+
+	if create2Result.Error != nil {
+		return -7
+	}
+
+	tx.Commit()
 
     return 0 // Successfully added friend
 
