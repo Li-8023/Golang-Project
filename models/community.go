@@ -59,6 +59,7 @@ func LoadCommunity(ownerId uint) ([]*Community, string, int){
 		objIds = append(objIds, uint64(v.TargetId))
 	}
 
+	
 	data := make([]*Community, 10)
 	utils.DB.Where("id in ?", objIds).Find(&data)
 	for _, v := range data {

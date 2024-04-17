@@ -246,7 +246,7 @@ func JoinGroup(userId uint, comId string) (int, string) {
 	}
 	utils.DB.Where("owner_id=? and target_id=? and type =2 ", userId, comId).Find(&contact)
 	
-	if !contact.CreatedAt.IsZero() {
+	if contact.TargetId != 0 {
 		return -1, "已加过此群"
 	} else {
 		contact.TargetId = community.ID
