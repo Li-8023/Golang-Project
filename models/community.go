@@ -52,21 +52,18 @@ func LoadCommunity(ownerId uint) ([]*Community, string, int){
         return nil, "无效的用户ID", -1 // "Invalid user ID"
     }
 
-	data := []*Community{}
+	contacts := make([]Contact, 0)
+	objIds := make([]uint64, 0)
+	utils.DB.Where("owner_id = ? and type=2", ownerId).Find(&contacts)
+	for _, v := range contacts {
+		objIds = append(objIds, uint64(v.TargetId))
+	}
 
-	result := utils.DB.Where("owner_id = ?", ownerId).Find(&data)
-
-	if result.Error != nil {
-        fmt.Printf("数据库查询错误: %v\n", result.Error) 
-        return nil, "加载失败", -1 // "Loading failed"
-    }
-
-	if len(data) == 0 {
-        return nil, "没有找到群组", -1 
-    }
-
+	data := make([]*Community, 10)
+	utils.DB.Where("id in ?", objIds).Find(&data)
 	for _, v := range data {
 		fmt.Println(v)
 	}
-	return data, "加载成功", 0
+	return data, "查询成功", 0
+	
 }

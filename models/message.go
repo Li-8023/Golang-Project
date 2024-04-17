@@ -2,12 +2,13 @@ package models
 
 import (
 	"encoding/json"
+	"ginchat/utils"
 	"fmt"
 	"net"
 	"net/http"
 	"strconv"
 	"sync"
-
+	
 	"github.com/gorilla/websocket"
 	"gopkg.in/fatih/set.v0"
 	"gorm.io/gorm"
@@ -55,7 +56,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	userId, _ := strconv.ParseInt(Id, 10, 64)
 
 	isValidToken := true
-
+	
 	conn, err := (&websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return isValidToken
@@ -222,3 +223,35 @@ func sendMsg(userId int64, msg []byte) {
 		node.DataQueue <- msg
 	}
 }
+
+func JoinGroup(userId uint, comId string) (int, string) {
+	if userId == 0 || comId == "" {
+        return -1, "无效的用户ID或群ID" 
+    }
+
+
+	contact := Contact{}
+	contact.OwnerId = userId
+	contact.Type = 2
+	community := Community{}
+
+	result := utils.DB.Where("id=? or name=?", comId, comId).Find(&community)
+	if result.Error != nil {
+        fmt.Printf("数据库查询错误: %v\n", result.Error) 
+        return -1, "数据库查询失败" 
+    }
+
+	if community.Name == "" {
+		return -1, "没有找到群"
+	}
+	utils.DB.Where("owner_id=? and target_id=? and type =2 ", userId, comId).Find(&contact)
+	
+	if !contact.CreatedAt.IsZero() {
+		return -1, "已加过此群"
+	} else {
+		contact.TargetId = community.ID
+		utils.DB.Create(&contact)
+		return 0, "加群成功"
+	}
+}
+

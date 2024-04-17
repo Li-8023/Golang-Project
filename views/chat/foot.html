@@ -499,6 +499,7 @@
                     var that = this;
                     post("contact/loadcommunity", { ownerId: userId() }, function (res) {
                         that.communitys = res.Rows || [];
+                        console.log("rows:", res.Rows)
                     })
                 },
                 addfriend: function () {
