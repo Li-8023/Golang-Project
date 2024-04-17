@@ -386,3 +386,16 @@ func CreateCommunity(c *gin.Context){
 		utils.RespFail(c.Writer, msg)
 	}
 }
+
+//加载群列表
+func LoadCommunity(c *gin.Context){
+	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
+
+	data, msg, code:= models.LoadCommunity(uint(ownerId))
+
+	if len(data) != 0{
+		utils.RespList(c.Writer, code, data, msg )
+	}else{
+		utils.RespFail(c.Writer, msg)
+	}
+}

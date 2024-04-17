@@ -39,8 +39,9 @@ func Router() *gin.Engine {
 	r.POST("/user/updateUser", service.UpdateUser)
 	r.POST("/user/login", service.Login)
 	
-	//group
+	//community
 	r.POST("/contact/createCommunity", service.CreateCommunity)
+	r.POST("/contact/loadcommunity", service.LoadCommunity)
 	//发送消息
 	r.GET("/user/sendMsg", service.SendMsg)
 	r.GET("/user/sendUserMsg", service.SendUserMsg)

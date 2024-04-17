@@ -136,7 +136,6 @@
                 iscomplete: false,
                 duration: 0,
                 showprocess: false,
-
             },
             created: function () {
                 this.loadfriends();
@@ -550,7 +549,6 @@
 
                 //新建群提交
                 createcommunity() {
-                    //console.log("createcommunity")
                     this.com.ownerId = userId()
                     console.log(this.com)
                     util.post("/contact/createCommunity", this.com).then(res => {
