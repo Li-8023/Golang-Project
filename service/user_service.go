@@ -328,6 +328,16 @@ func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
 
+func RedisMsg(c *gin.Context) {
+	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
+	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
+	start, _ := strconv.Atoi(c.PostForm("start"))
+	end, _ := strconv.Atoi(c.PostForm("end"))
+	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
+	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	utils.RespOKList(c.Writer, "ok", res)
+}
+
 func SearchFriend(c *gin.Context) {
 	// id, _ := strconv.Atoi(c.PostForm("userId"))
 	 idStr := c.Request.FormValue("userId")
